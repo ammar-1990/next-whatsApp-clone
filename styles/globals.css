@@ -6,3 +6,12 @@
 .input{
   @apply p-3 border border-green-600 border-t-0 border-l-0 border-r-0 outline-none
 }
+
+
+.myScroll{
+  @apply overflow-y-scroll
+}
+
+.myScroll::-webkit-scrollbar{
+  @apply hidden
+}

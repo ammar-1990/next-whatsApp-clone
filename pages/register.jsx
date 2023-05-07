@@ -38,7 +38,7 @@ const register = () => {
       });
   };
   return (
-    <div className="h-screen flex items-center justify-center flex-col">
+    <div className="h-screen flex items-center justify-center flex-col bg-gray-100">
       <Head>
         <title>Register</title>
 
@@ -47,6 +47,8 @@ const register = () => {
           href="https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c543.png"
         />
       </Head>
+      <div className="bg-white p-8 shadow-gray-400 shadow-md flex flex-col items-center rounded-lg">
+
       <img
         src="https://www.freepnglogos.com/uploads/whatsapp-logo-image-8.png"
         width={300}
@@ -95,6 +97,8 @@ const register = () => {
           </Link>
         </p>
       </form>
+      </div>
+   
     </div>
   );
 };

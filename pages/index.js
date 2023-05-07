@@ -7,6 +7,17 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import {  onAuthStateChanged } from "firebase/auth";
 import { useState } from 'react'
+import Loading from '@/components/Loading'
+import {serverTimestamp} from 'firebase/firestore'
+import { db } from '@/firebase'
+import { doc ,setDoc } from 'firebase/firestore'
+
+
+
+
+
+
+
 const inter = Inter({ subsets: ['latin'] })
 
 
@@ -20,8 +31,10 @@ export default function Home() {
   useEffect(()=>{
     onAuthStateChanged(auth, (user) => {
       if(user){
-        console.log(user)
+      
         setTheUser(user)
+        const userRef = doc(db, 'users', user.uid);
+        setDoc(userRef, {email:user.email, lastSeen: serverTimestamp() },{ merge: true });
       }
       else {
         setTheUser(null)
@@ -32,7 +45,7 @@ router.push('/login')
   },[])
 
 
-  if(!theUser) return <p className='h-screen flex items-center justify-center text-gray-700 text-3xl animate-pulse'>Loading...</p>
+  if(!theUser) return <Loading />
 
   return (
    <div >
