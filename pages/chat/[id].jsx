@@ -1,6 +1,6 @@
 import SideBar from "@/components/SideBar"
 import { useRouter } from "next/router"
-import { collection, query, orderBy, getDocs, doc, setDoc, serverTimestamp,getDoc } from "firebase/firestore";
+import { collection, query, orderBy, getDocs, doc, setDoc, serverTimestamp,getDoc, onSnapshot, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useEffect,useState } from "react";
 import Loading from "@/components/Loading";
@@ -16,6 +16,8 @@ const ChatId = ({id}) => {
 const [theUser, setTheUser] = useState(null)
 const [theMessages,setTheMessages] = useState([])
 const [chat , setChat] = useState(null)
+const [other, setOther] = useState(null)
+const router = useRouter()
 
 
     useEffect(()=>{
@@ -25,7 +27,7 @@ const [chat , setChat] = useState(null)
             setTheUser(user)
          
             const userRef = doc(db, 'users', user.uid);
-            setDoc(userRef, {email:user.email, lastSeen: serverTimestamp() },{ merge: true });
+            setDoc(userRef, {email:user.email, lastSeen:new Date(Date.now()).toLocaleString() },{ merge: true });
           }
           else {
             setTheUser(null)
@@ -35,18 +37,16 @@ const [chat , setChat] = useState(null)
         });
 const fetchChats = async()=>{
 
-  const q = query(collection(db, "chats",id,'messages'), orderBy('timestamp', 'asc'));
-    const querySnapshot = await getDocs(q);
-    const messages = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setTheMessages(messages)
 
-console.log(messages)
+
+
     const chatRef = doc(db, 'chats', id);
     const chatDoc = await getDoc(chatRef);
     const theChat = {id:chatDoc.id,...chatDoc.data()}
 
     setChat(theChat)
-    console.log(theChat)
+  
+    
 
    
 
@@ -56,13 +56,67 @@ console.log(messages)
 
 
 fetchChats()
+const  q = query(collection(db, "chats",id,'messages'), orderBy('timeStamp', 'asc'));
+const unsub = onSnapshot(q,(querySnapshot) => {
+    let list =[];
+   querySnapshot.forEach(doc=>{
+     list.push({id:doc.id,...doc.data()})
+ 
+    })
+  
+ setTheMessages(list)
+
+ 
+    
+   },(error)=>{
+     console.log(error)
+   });
+
+ 
+
+
+
+
+
+
+   return ()=> {
+     unsub();
+ 
+   };
+
+
+
+
+
+      },[id])
+
+
+      useEffect(()=>{
+        const  q2 = query(collection(db, "users"));
+        const unsub2 = onSnapshot(q2,(querySnapshot) => {
+      
+     let list=[];
+         querySnapshot?.forEach(doc=>{
+         list.push({id:doc?.id,...doc?.data()})
        
+          })
+      const theOther= getOtherUsder(chat?.users,theUser?.email)
+        
+         setOther(list.find(el=>el?.email===theOther))
+      console.log(other)
+      
+     
+     
+            
+           },(error)=>{
+             console.log(error)
+           });
+        
+     return ()=>{
+        unsub2();
+     }
 
-
-
-
-
-      },[])
+      },[chat,theUser])
 
 
 
@@ -81,7 +135,7 @@ fetchChats()
         />
       </Head>
         <SideBar />
-        <ChatScreen chat={chat} messages={theMessages} theUser={theUser}/>
+        <ChatScreen chat={chat} messages={theMessages} theUser={theUser}  id={id} other={other}/>
 
     </div>
   )

@@ -34,7 +34,7 @@ export default function Home() {
       
         setTheUser(user)
         const userRef = doc(db, 'users', user.uid);
-        setDoc(userRef, {email:user.email, lastSeen: serverTimestamp() },{ merge: true });
+        setDoc(userRef, {email:user.email, lastSeen: new Date(Date.now()).toLocaleString() },{ merge: true });
       }
       else {
         setTheUser(null)
