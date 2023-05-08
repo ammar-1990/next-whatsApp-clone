@@ -3,17 +3,21 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import { Avatar, IconButton } from "@mui/material";
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import MicIcon from '@mui/icons-material/Mic';
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { collection, doc, setDoc, serverTimestamp, addDoc } from "firebase/firestore";
-
+import Moment from 'react-moment';
 import { db } from "@/firebase";
 import Message from "./message";
 import { getOtherUsder } from "@/lib/getOtherUser";
 
 const ChatScreen = ({ chat, messages, theUser ,id,other}) => {
 
-    const [input,setInput] = useState('')
+    const end = useRef()
 
+    const [input,setInput] = useState('')
+useEffect(()=>{
+    end.current.scrollIntoView({behavior:'smooth',block:'start'})
+},[])
 
     const submit = async(e)=>{
         e.preventDefault()
@@ -27,6 +31,7 @@ const ChatScreen = ({ chat, messages, theUser ,id,other}) => {
 
           });
           setInput('')
+          end.current.scrollIntoView({behavior:'smooth',block:'start'})
         
 
 
@@ -36,11 +41,11 @@ const ChatScreen = ({ chat, messages, theUser ,id,other}) => {
       {/* head */}
       <div className="flex justify-between p-5 px-8 sticky top-0 z-10 border border-t-0 border-l-0 border-r-0 ">
         <div className="flex gap-3 items-center">
-          <Avatar sx={{cursor:'pointer'}}></Avatar>
+          {getOtherUsder(chat?.users,theUser?.email)&&<Avatar sx={{cursor:'pointer',textTransform:'uppercase'}}>{getOtherUsder(chat?.users,theUser?.email)?.slice(0,1)}</Avatar>}
 
           <div>
             <h3 className="font-semibold ">{getOtherUsder(chat?.users,theUser.email)}</h3>
-            <p className="text-gray-500 text-xs">{other?.lastSeen}</p>
+            {other&&<p className="text-gray-500 text-xs">Last seen: <Moment fromNow date={other.lastSeen} /></p>}
           </div>
         </div>
         <div className="flex items-center gap-8">
@@ -50,9 +55,9 @@ const ChatScreen = ({ chat, messages, theUser ,id,other}) => {
       </div>
 
       {/* body */}
-<div className="flex-1 bg-[#e5ded8]">
-    {messages.map(el=><Message key={el.id} {...el} />)}
-
+<div className="flex-1 bg-[#e5ded8] myScroll">
+    {messages.map(el=><Message key={el.id} {...el} theUser={theUser}/>)}
+<div ref={end} />
 
 </div>
 
