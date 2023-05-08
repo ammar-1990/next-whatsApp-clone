@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { collection, doc, setDoc, serverTimestamp, addDoc } from "firebase/firestore";
 import Moment from 'react-moment';
 import { db } from "@/firebase";
-import Message from "./message";
+import Message from "./Message";
 import { getOtherUsder } from "@/lib/getOtherUser";
 
 const ChatScreen = ({ chat, messages, theUser ,id,other}) => {
